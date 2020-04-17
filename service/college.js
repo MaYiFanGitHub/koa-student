@@ -27,7 +27,7 @@ exports.findAllCollege = async ctx => {
     countSql += ' and t_college.college_name like "%' + college_name + '%"';
   }
   sql +=
-    ' limit ' + (currentPage - 1) * pageSize + ',' + currentPage * pageSize;
+    ' limit ' + ((currentPage - 1) * pageSize) + ',' + pageSize;
   const result = await db.query(sql)
   const countResult = await db.query(countSql);
   console.log(countResult[0].count + '------')
@@ -56,4 +56,11 @@ exports.updateCollege = async ctx => {
   let sql = 'update t_college set user_id = ?, college_name = ?, college_desc = ?, college_email = ?, college_room = ?, college_tel = ? where college_id = ?'
   await db.update(sql, [params.user_id, params.college_name, params.college_desc, params.college_email, params.college_room, params.college_tel, params.college_id])
   ctx.success()
+}
+
+// 查询所有学院
+exports.selectCollege = async ctx => {
+  let sql = 'SELECT t_college.*,t_user.user_name from t_college LEFT JOIN t_user ON t_college.user_id=t_user.user_id where t_college.is_delete=0'
+  const result = await db.query(sql)
+  ctx.success(result)
 }

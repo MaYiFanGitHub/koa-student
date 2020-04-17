@@ -22,7 +22,8 @@ exports.selectAllUser = async ctx => {
   }
 
   sql +=
-    ' limit ' + (currentPage - 1) * pageSize + ',' + currentPage * pageSize;
+    ' limit ' + ((currentPage - 1) * pageSize) + ',' + pageSize;
+    console.log(sql)
   const result = await db.query(sql);
   const countResult = await db.query(countSql);
 
