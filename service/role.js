@@ -9,6 +9,7 @@ exports.selectAllRole = async (ctx) => {
 // 添加角色
 exports.addRole = async (ctx) => {
   let obj = ctx.request.body;
+  console.log(obj)
   let sql = 'insert into t_role set ?';
   delete obj.role_id
   await db.insert(sql, obj)
