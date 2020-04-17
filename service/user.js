@@ -1,9 +1,39 @@
 const db = require('../util/DB');
 
 // 查询全部的角色
-exports.selectAllRole = async ctx => {
-  const result = await db.query('select * from t_role where is_delete = 0');
-  ctx.success(result);
+exports.selectAllUser = async ctx => {
+  let params = ctx.query;
+  const { currentPage, pageSize, user_username, user_name, role_id } = params;
+  let sql =
+    'SELECT t_user.*,t_role.role_name from t_user LEFT JOIN t_role ON t_user.role_id=t_role.role_id where t_user.is_delete=0';
+  let countSql =
+    'SELECT count(*) as count from t_user LEFT JOIN t_role ON t_user.role_id=t_role.role_id where t_user.is_delete=0';
+  if (user_username) {
+    sql += ' and t_user.user_username like "%' + user_username + '%"';
+    countSql += ' and t_user.user_username like "%' + user_username + '%"';
+  }
+  if (user_name) {
+    sql += ' and t_user.user_name like "%' + user_name + '%"';
+    countSql += ' and t_user.user_name like "%' + user_name + '%"';
+  }
+  if (role_id != -1) {
+    sql += ' and t_user.role_id = ' + role_id;
+    countSql += ' and t_user.role_id = ' + role_id;
+  }
+
+  sql +=
+    ' limit ' + (currentPage - 1) * pageSize + ',' + currentPage * pageSize;
+  const result = await db.query(sql);
+  const countResult = await db.query(countSql);
+
+  ctx.success({
+    userList: result,
+    page: {
+      currentPage: parseInt(currentPage),
+      pageSize: parseInt(pageSize),
+      total: countResult[0].count
+    }
+  });
 };
 
 // 添加用户
@@ -28,19 +58,19 @@ exports.addMoreUser = async ctx => {
   ctx.success();
 };
 
-// 删除角色
-exports.removeRole = async ctx => {
+// 删除用户
+exports.removeUser = async ctx => {
   let params = ctx.query;
   console.log('params = ', params);
-  let sql = 'update t_role set is_delete = 1 where role_id = ?';
-  await db.delete(sql, [params.role_id]);
+  let sql = 'update t_user set is_delete = 1 where user_username = ?';
+  await db.delete(sql, [params.user_username]);
   ctx.success();
 };
 
-// 更新角色
-exports.editRole = async ctx => {
+// 更新用户
+exports.editUser = async ctx => {
   let params = ctx.request.body;
-  let sql = 'update t_role set role_name = ?, role_rank = ? where role_id = ?';
-  await db.update(sql, [params.role_name, params.role_rank, params.role_id]);
+  let sql = 'update t_user set user_culture = ?, role_id = ?, user_name = ?, user_last_name = ?, user_sex = ?, user_age = ?, user_nation = ?, user_tel = ?, user_birthday = ?, user_address = ?, user_heath = ?  where user_username = ?';
+  await db.update(sql, [params.user_culture, params.role_id, params.user_name, params.user_last_name, params.user_sex, params.user_age, params.user_nation, params.user_tel, params.user_birthday, params.user_address, params.user_heath, params.user_username]);
   ctx.success();
 };
