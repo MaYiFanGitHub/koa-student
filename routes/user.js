@@ -14,5 +14,7 @@ router.post('/addMore', userService.addMoreUser)
 router.get('/remove', userService.removeUser)
 // 更新用户
 router.post('/edit', userService.editUser)
+// 查询院长身份
+router.get('/findDean', userService.findDeanUser)
 
 module.exports = router 

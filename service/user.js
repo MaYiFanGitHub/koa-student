@@ -74,3 +74,10 @@ exports.editUser = async ctx => {
   await db.update(sql, [params.user_culture, params.role_id, params.user_name, params.user_last_name, params.user_sex, params.user_age, params.user_nation, params.user_tel, params.user_birthday, params.user_address, params.user_heath, params.user_username]);
   ctx.success();
 };
+
+// 查询院长身份的用户
+exports.findDeanUser = async ctx => {
+  let sql = 'select * from t_user where role_id in (select role_id from t_role where role_name = "院长")'
+  const result = await db.query(sql)
+  ctx.success(result)
+}
