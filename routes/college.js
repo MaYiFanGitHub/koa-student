@@ -14,4 +14,6 @@ router.get('/remove', collegeService.removeCollege)
 router.post('/edit', collegeService.updateCollege)
 // 查询所有学院
 router.get('/select', collegeService.selectCollege)
+// 查询学院下面的专业
+router.get('/selectByMajor', collegeService.selectByMajor)
 module.exports = router 

@@ -16,7 +16,6 @@ exports.addMajor = async ctx => {
 exports.findAllMajor = async ctx => {
   let params = ctx.query;
   const { currentPage, pageSize, specialty_name, college_id } = params;
-  console.log(params);
   let sql =
     'SELECT t_specialty.*,t_college.college_name from t_specialty LEFT JOIN t_college ON t_specialty.college_id=t_college.college_id where t_specialty.is_delete=0';
   let countSql =
@@ -31,7 +30,6 @@ exports.findAllMajor = async ctx => {
     countSql += ' and t_specialty.specialty_name like "%' + specialty_name  + '%"';
   }
   sql += ' limit ' + (currentPage - 1) * pageSize + ',' + pageSize;
-  console.log(sql);
   const result = await db.query(sql);
   const countResult = await db.query(countSql);
   ctx.success({
@@ -44,6 +42,20 @@ exports.findAllMajor = async ctx => {
   });
 };
 
-// 删除专业
-
 // 更新专业
+exports.updateMajor = async ctx => {
+  let params = ctx.request.body;
+  let sql = 'update t_specialty set college_id = ?, specialty_name = ?, specialty_desc = ?  where specialty = ?';
+  await db.update(sql, [params.college_id, params.specialty_name, params.specialty_desc,  params.specialty]);
+  ctx.success();
+};
+
+// 删除专业
+exports.removeMajor = async ctx => {
+  let params = ctx.query
+  let sql = 'update t_specialty set is_delete = 1 where specialty = ?'
+  console.log(sql)
+  console.log(params)
+  await db.query(sql, [params.specialty])
+  ctx.success()
+}

@@ -82,3 +82,10 @@ exports.findDeanUser = async ctx => {
   const result = await db.query(sql)
   ctx.success(result)
 }
+
+// 查询教师身份的用户
+exports.findTeacherUser = async ctx => {
+  let sql = 'select * from t_user where role_id in (select role_id from t_role where role_name = "教师")'
+  const result = await db.query(sql)
+  ctx.success(result)
+}

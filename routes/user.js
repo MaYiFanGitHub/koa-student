@@ -16,5 +16,7 @@ router.get('/remove', userService.removeUser)
 router.post('/edit', userService.editUser)
 // 查询院长身份
 router.get('/findDean', userService.findDeanUser)
+// 查询教师身份
+router.get('/findTeacher', userService.findTeacherUser)
 
 module.exports = router 

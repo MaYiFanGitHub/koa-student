@@ -64,3 +64,25 @@ exports.selectCollege = async ctx => {
   const result = await db.query(sql)
   ctx.success(result)
 }
+
+// 查询学院下面的专业
+exports.selectByMajor = async ctx => {
+  let sql = 'SELECT t_college.college_name, t_specialty.specialty_name FROM t_college LEFT JOIN t_specialty ON t_college.college_id=t_specialty.college_id WHERE t_college.is_delete=0 AND t_specialty.is_delete=0'
+  const result = await db.query(sql)
+  const map = new Map()
+
+  result.forEach(item => {
+    if (map.has(item.college_name)) {
+      let values = map.get(item.college_name)
+      values.push(item.specialty_name)
+    } else {
+      map.set(item.college_name, [item.specialty_name])
+    }
+  })
+  
+  let responseData = {}
+  for (const [k, v] of map) {
+    responseData[k] = v
+  }
+  ctx.success(responseData)
+}
