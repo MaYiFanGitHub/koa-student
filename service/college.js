@@ -14,7 +14,7 @@ exports.addCollege = async ctx => {
 exports.findAllCollege = async ctx => {
   let params = ctx.query;
   const { currentPage, pageSize, college_name, user_name} = params;
-  console.log(params)
+
   let sql = 'SELECT t_college.*,t_user.user_name from t_college LEFT JOIN t_user ON t_college.user_id=t_user.user_id where t_college.is_delete=0'
   let countSql = 'SELECT count(*) as count from t_college LEFT JOIN t_user ON t_college.user_id=t_user.user_id where t_college.is_delete=0'
 
@@ -67,22 +67,32 @@ exports.selectCollege = async ctx => {
 
 // 查询学院下面的专业
 exports.selectByMajor = async ctx => {
-  let sql = 'SELECT t_college.college_name, t_specialty.specialty_name FROM t_college LEFT JOIN t_specialty ON t_college.college_id=t_specialty.college_id WHERE t_college.is_delete=0 AND t_specialty.is_delete=0'
+  let sql = 'SELECT t_college.college_name, t_college.college_id, t_specialty.specialty_name, t_specialty.specialty FROM t_college LEFT JOIN t_specialty ON t_college.college_id=t_specialty.college_id WHERE t_college.is_delete=0 AND t_specialty.is_delete=0'
   const result = await db.query(sql)
-  const map = new Map()
 
+  console.log(result)
+  let responseData = []
   result.forEach(item => {
-    if (map.has(item.college_name)) {
-      let values = map.get(item.college_name)
-      values.push(item.specialty_name)
+    let obj = responseData.find(data => data.college_id === item.college_id)
+    if (obj) { // 有
+      if (obj.majorList) {
+        obj.majorList.push({
+          'specialty':item.specialty,
+          'specialty_name':item.specialty_name
+        })
+      }
     } else {
-      map.set(item.college_name, [item.specialty_name])
+      responseData.push({
+        college_id: item.college_id,
+        college_name: item.college_name,
+        majorList: [{
+          'specialty':item.specialty,
+          'specialty_name':item.specialty_name
+        }]
+      })
     }
   })
   
-  let responseData = {}
-  for (const [k, v] of map) {
-    responseData[k] = v
-  }
+
   ctx.success(responseData)
 }
