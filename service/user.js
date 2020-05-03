@@ -50,12 +50,40 @@ exports.addUser = async ctx => {
 exports.addMoreUser = async ctx => {
   let obj = ctx.request.body;
   let userList = obj.map(user => {
-    delete user.user_id;
+    user.user_id = parseInt(Date.now() + parseInt(Math.random() * 10000, 10) + 1).toString().substr(6, 12) 
+    return Object.values(user);
+  });
+  console.log(userList)
+  var sql =
+    'INSERT INTO t_user (user_username, user_password, role_id, user_name, user_sex, user_age, user_address, user_nation, user_tel, user_birthday, user_last_name, user_heath, user_culture, user_id) VALUES ?';
+  await db.insert(sql, [userList]);
+  ctx.success();
+};
+
+// 添加多条教师或者教秘用户
+exports.addMoreTeacher = async ctx => {
+  let obj = ctx.request.body;
+  let user_ids = []
+  let teacher_titles = []
+  let userList = obj.map(user => {
+    teacher_titles.push(user.teacher_title)
+    delete user.teacher_title
+    user.user_id = parseInt(Date.now() + parseInt(Math.random() * 10000, 10) + 1).toString().substr(6, 12) 
+    user_ids.push(user.user_id)
     return Object.values(user);
   });
   var sql =
-    'INSERT INTO t_user (user_username, user_password, role_id, user_name, user_sex, user_age, user_address, user_nation, user_tel, user_birthday, user_last_name, user_heath, user_culture) VALUES ?';
+    'INSERT INTO t_user (user_username, user_password, role_id, user_name, user_sex, user_age, user_address, user_nation, user_tel, user_birthday, user_last_name, user_heath, user_culture, user_id) VALUES ?';
   await db.insert(sql, [userList]);
+
+  let userList1 = obj.map(user => {
+    user.user_id = user_ids.pop()
+    user.teacher_id = parseInt(Date.now() + parseInt(Math.random() * 10000, 10) + 1).toString().substr(6, 12)
+    return [user.teacher_id, user.user_id, teacher_titles.pop()];
+  });
+  console.log(userList1)
+  var sql1 = 'insert into t_teacher_info (teacher_id, user_id, teacher_title) values ?'
+  await db.insert(sql1, [userList1]);
   ctx.success();
 };
 

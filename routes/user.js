@@ -10,6 +10,7 @@ router.get('/all', userService.selectAllUser)
 router.post('/add', userService.addUser)
 // 添加多条用户
 router.post('/addMore', userService.addMoreUser)
+router.post('/addTeacher', userService.addMoreTeacher)
 // 删除用户
 router.get('/remove', userService.removeUser)
 // 更新用户
