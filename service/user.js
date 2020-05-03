@@ -89,3 +89,21 @@ exports.findTeacherUser = async ctx => {
   const result = await db.query(sql)
   ctx.success(result)
 }
+
+// 登录
+exports.login = async ctx => {
+  let params = ctx.request.body;
+  let sql = 'select * from t_user left join t_role on t_user.role_id = t_role.role_id where t_user.user_username = ? and t_user.user_password = ? and t_user.role_id = ?'
+  const result = await db.query(sql, [params.user_username, params.user_password, params.role_id])
+  if (result.length === 0) {
+    ctx.fail()
+  } else {
+    ctx.success(result[0])
+    ctx.session.userInfo=[result[0]]
+  }
+}
+// 退出登录
+exports.logout = async ctx => {
+  ctx.session.userInfo = {}
+  ctx.success()
+}

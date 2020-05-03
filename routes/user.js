@@ -18,5 +18,9 @@ router.post('/edit', userService.editUser)
 router.get('/findDean', userService.findDeanUser)
 // 查询教师身份
 router.get('/findTeacher', userService.findTeacherUser)
+// 登录
+router.post('/login', userService.login)
+// 退出
+router.get('/logout', userService.logout)
 
 module.exports = router 
