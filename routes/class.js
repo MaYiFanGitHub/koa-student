@@ -12,4 +12,6 @@ router.get('/all', classService.findAllClass)
 router.get('/remove', classService.removeClass)
 // 更新班级
 router.post('/edit', classService.updateClass)
+// 查询所有班级
+router.get('/queryList', classService.queryClassList)
 module.exports = router 

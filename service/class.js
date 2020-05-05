@@ -64,3 +64,10 @@ exports.removeClass = async ctx => {
   await db.query(sql, [params.class_id])
   ctx.success()
 }
+
+// 查询所有班级
+exports.queryClassList = async ctx => {
+  let sql = 'select * from t_class'
+  let res = await db.query(sql)
+  ctx.success(res)
+}

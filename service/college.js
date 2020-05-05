@@ -3,10 +3,14 @@ const db = require('../util/DB')
 // 添加学院
 exports.addCollege = async ctx => {
   let params = ctx.request.body
-  console.log(params)
   let sql = 'insert into t_college set ?'
   delete params.college_id
-  await db.insert(sql, params)
+  const res = await db.insert(sql, params)
+  
+  let college_id = res.insertId
+  // 进行用户表复填操作
+  let userSql = 'update t_user set college_id = ' + college_id + ' where user_id = ' + params.user_id
+  await db.update(userSql)
   ctx.success()
 }
 

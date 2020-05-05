@@ -11,6 +11,7 @@ router.post('/add', userService.addUser)
 // 添加多条用户
 router.post('/addMore', userService.addMoreUser)
 router.post('/addTeacher', userService.addMoreTeacher)
+router.post('/addStudent', userService.addMoreStudent)
 // 删除用户
 router.get('/remove', userService.removeUser)
 // 更新用户
@@ -23,5 +24,6 @@ router.get('/findTeacher', userService.findTeacherUser)
 router.post('/login', userService.login)
 // 退出
 router.get('/logout', userService.logout)
-
+// 查询政治面貌
+router.get('/queryPolitics', userService.queryPolitics)
 module.exports = router 
