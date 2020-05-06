@@ -226,6 +226,14 @@ exports.editUser = async ctx => {
     params.user_heath,
     params.user_username
   ]);
+
+  if (params.role_id == 2 || params.role_id == 4) { // 修改教师表
+    let teacherSql = 'update t_teacher_info set teacher_title = ? where user_id = ?'
+    await db.update(teacherSql, [params.teacher_title, params.user_id])
+  } else if (params.role_id == 3) { // 修改学生表
+    let studentSql = 'update t_student_info set politics_status_id = ?, class_id = ? where user_id = ?'
+    await db.update(studentSql, [params.politics_status_id, params.class_id, params.user_id])
+  }
   ctx.success();
 };
 
