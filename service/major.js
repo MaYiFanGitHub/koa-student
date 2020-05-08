@@ -59,3 +59,49 @@ exports.removeMajor = async ctx => {
   await db.query(sql, [params.specialty])
   ctx.success()
 }
+
+// 查询本学院下面的专业和班级
+exports.queryMajorAndClassByCollege = async ctx => {
+  let sql = `
+  SELECT
+    t_specialty.specialty,
+    t_class.class_id,
+    t_specialty.specialty_name,
+    t_class.class_name
+  FROM
+    t_specialty
+  LEFT JOIN t_class ON t_specialty.specialty = t_class.specialty
+  WHERE
+    t_specialty.is_delete = 0
+  AND t_class.is_delete = 0
+  AND t_specialty.college_id = 
+  `
+  sql += ctx.session.userInfo.college_id
+  console.log(sql)
+  const result = await db.query(sql)
+
+  let responseData = []
+  result.forEach(item => {
+    let obj = responseData.find(data => data.specialty === item.specialty)
+    if (obj) { // 有
+      if (obj.classList) {
+        obj.classList.push({
+          'class_id':item.class_id,
+          'class_name':item.class_name
+        })
+      }
+    } else {
+      responseData.push({
+        specialty: item.specialty,
+        specialty_name: item.specialty_name,
+        classList: [{
+          'class_id':item.class_id,
+          'class_name':item.class_name
+        }]
+      })
+    }
+  })
+  
+
+  ctx.success(responseData)
+}

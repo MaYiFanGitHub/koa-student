@@ -12,5 +12,7 @@ router.get('/all', majorService.findAllMajor)
 router.get('/remove', majorService.removeMajor)
 // 更新专业
 router.post('/edit', majorService.updateMajor)
+// 查询本学院下面的专业和班级
+router.get('/queryMajorAndClass', majorService.queryMajorAndClassByCollege)
 
 module.exports = router 

@@ -4,7 +4,7 @@ const db = require('../util/DB')
 exports.addCourse = async ctx => {
   let params = ctx.request.body
   let teacher_id = params.teacher_id
-  let college_id = ctx.session.userInfo.teacher_college_id
+  let college_id = ctx.session.userInfo.college_id
   let sql = 'insert into t_course set ?'
 
   params.course_year = params.course_year_begin + '-' + params.course_year_end
@@ -31,7 +31,7 @@ exports.addMoreCourse = async ctx => {
   let obj = ctx.request.body;
   let teacher_ids = []
   let course_ids = []
-  let college_id = ctx.session.userInfo.teacher_college_id
+  let college_id = ctx.session.userInfo.college_id
 
   let courseList = obj.map((course, index) => {
     course.course_id = 'o_' + Date.now().toString().substr(6, 10) + index
@@ -125,10 +125,18 @@ exports.updateCourse = async ctx => {
   await db.update(midSql, [params.teacher_id, params.course_id])
   ctx.success()
 }
-// 删除学院
+// 删除课程
 exports.removeCourse = async ctx => {
   let params = ctx.query
   let sql = 'update t_course set is_delete = 1 where course_id = ?'
   await db.query(sql, [params.course_id])
   ctx.success()
+}
+// 查询本学院下的所有课程
+exports.queryCourseList = async ctx => {
+  let sql =
+    'SELECT t_course.*, t_college.college_name, t_teacher_score.teacher_id, t_user.user_id, t_user.user_name FROM t_course LEFT JOIN t_college ON t_course.college_id=t_college.college_id LEFT JOIN t_teacher_score ON t_teacher_score.course_id=t_course.course_id LEFT JOIN t_teacher_info ON t_teacher_info.teacher_id=t_teacher_score.teacher_id LEFT JOIN t_user ON t_teacher_info.user_id=t_user.user_id  WHERE t_course.is_delete=0 AND t_course.college_id= ?';
+  let college_id = ctx.session.userInfo.college_id
+  const result = await db.query(sql, [college_id])
+  ctx.success(result)
 }

@@ -15,6 +15,6 @@ router.get('/all', courseService.findAllCourse)
 router.get('/remove', courseService.removeCourse)
 // 更新班级
 router.post('/edit', courseService.updateCourse)
-// 查询所有班级
-// router.get('/queryList', courseService.queryCourseList)
+// 查询本学院下的所有课程
+router.get('/queryList', courseService.queryCourseList)
 module.exports = router 
