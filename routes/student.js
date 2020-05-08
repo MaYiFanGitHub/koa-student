@@ -10,6 +10,8 @@ router.get('/queryByCollege', StudentService.selectStudentByCollege)
 router.post('/add', StudentService.addMoreScore)
 // 更新成绩
 router.post('/updateScore', StudentService.updateScore)
+// 成绩异议更新
+router.post('/applyScore', StudentService.applyScore)
 // 删除成绩
 router.get('/deleteScore', StudentService.deleteScore)
 // 分页多条件查询成绩
@@ -18,6 +20,8 @@ router.get('/all', StudentService.teacherQueryScoreList)
 router.get('/queryPersonScore', StudentService.queryPersonScore)
 // 查询学生的个人信息
 router.get('/queryStudentInfo', StudentService.queryStudentInfo)
+// 成绩异议查询
+router.get('/queryApplyList', StudentService.applyScoreList)
 // 删除班级
 // router.get('/remove', StudentService.removeStudent)
 // 更新班级

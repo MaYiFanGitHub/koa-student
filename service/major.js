@@ -77,7 +77,6 @@ exports.queryMajorAndClassByCollege = async ctx => {
   AND t_specialty.college_id = 
   `
   sql += ctx.session.userInfo.college_id
-  console.log(sql)
   const result = await db.query(sql)
 
   let responseData = []
