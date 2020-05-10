@@ -241,7 +241,7 @@ exports.removeUser = async ctx => {
 exports.editUser = async ctx => {
   let params = ctx.request.body;
   let sql =
-    'update t_user set user_culture = ?, role_id = ?, user_name = ?, user_last_name = ?, user_sex = ?, user_age = ?, user_nation = ?, user_tel = ?, user_birthday = ?, user_address = ?, user_heath = ?  where user_username = ?';
+    'update t_user set user_culture = ?, role_id = ?, user_name = ?, user_last_name = ?, user_sex = ?, user_age = ?, user_nation = ?, user_tel = ?, user_birthday = ?, user_address = ?, user_heath = ?  where user_id = ?';
   await db.update(sql, [
     params.user_culture,
     params.role_id,
@@ -254,7 +254,7 @@ exports.editUser = async ctx => {
     params.user_birthday,
     params.user_address,
     params.user_heath,
-    params.user_username
+    params.user_id
   ]);
 
   if (params.role_id == 2 || params.role_id == 4) { // 修改教师表
@@ -348,4 +348,13 @@ exports.queryPolitics = async ctx => {
   let sql = 'select * from t_politics_status'
   let res = await db.query(sql)
   ctx.success(res)
+}
+
+// 修改密码
+exports.updatePassword = async ctx => {
+  let params = ctx.request.body;
+  console.log(params)
+  let sql = 'update t_user set user_password = ? where user_id = ?'
+  await db.update(sql, [params.user_password, params.user_id])
+  ctx.success()
 }

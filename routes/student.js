@@ -22,6 +22,16 @@ router.get('/queryPersonScore', StudentService.queryPersonScore)
 router.get('/queryStudentInfo', StudentService.queryStudentInfo)
 // 成绩异议查询
 router.get('/queryApplyList', StudentService.applyScoreList)
+// 查询个人资料
+router.get('/queryPersonInfo', StudentService.queryPersonInfo)
+// 上传文件
+router.post('/uploadFile', StudentService.uploadFile)
+// 添加教育背景
+router.post('/addEdu', StudentService.addEduList)
+// 添加家庭成员
+router.post('/addFamily', StudentService.addFamilyList)
+// 添加政治面貌信息
+router.post('/addPolitics', StudentService.addPolitics)
 // 删除班级
 // router.get('/remove', StudentService.removeStudent)
 // 更新班级

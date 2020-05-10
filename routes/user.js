@@ -26,4 +26,6 @@ router.post('/login', userService.login)
 router.get('/logout', userService.logout)
 // 查询政治面貌
 router.get('/queryPolitics', userService.queryPolitics)
+// 修改面
+router.post('/updatePassword', userService.updatePassword)
 module.exports = router 
