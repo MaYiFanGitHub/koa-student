@@ -499,3 +499,4 @@ exports.uploadFile = async ctx => {
       file_id: res.insertId
   }
 }
+// 学生基本信息管理
