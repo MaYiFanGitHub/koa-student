@@ -16,6 +16,8 @@ router.post('/applyScore', StudentService.applyScore)
 router.get('/deleteScore', StudentService.deleteScore)
 // 分页多条件查询成绩
 router.get('/all', StudentService.teacherQueryScoreList)
+// 学生基本信息查询
+router.get('/queryStudentInfoList', StudentService.queryStudentInfoList)
 // 查询学生的个人成绩
 router.get('/queryPersonScore', StudentService.queryPersonScore)
 // 查询学生的个人信息

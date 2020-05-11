@@ -265,39 +265,13 @@ exports.applyScoreList = async ctx => {
 }
 
 // 学生个人资料
-/* 
-  SELECT
-    t_role.role_name,
-    t_user.student_id,
-    t_user.user_name,
-    t_college.college_name,
-    t_specialty.specialty_name,
-    t_class.class_name,
-    t_teacher_info.teacher_title,
-    t_edu.edu_id,
-    t_family.family_id,
-    t_politics_status_info.politics_status_info_id,
-    t_file.file_url
-  FROM
-    t_user
-  LEFT JOIN t_student_info ON t_user.student_id = t_student_info.student_id
-  LEFT JOIN t_teacher_info ON t_user.teacher_id = t_teacher_info.teacher_id
-  LEFT JOIN t_class ON t_class.class_id = t_student_info.class_id
-  LEFT JOIN t_specialty ON t_specialty.specialty = t_class.specialty
-  LEFT JOIN t_college ON t_user.college_id = t_college.college_id
-  LEFT JOIN t_role ON t_user.role_id = t_role.role_id
-  LEFT JOIN t_edu ON t_student_info.student_id = t_edu.student_id
-  LEFT JOIN t_family ON t_family.student_id = t_student_info.student_id
-  LEFT JOIN t_politics_status_info ON t_student_info.politics_status_info_id = t_politics_status_info.politics_status_info_id
-  LEFT JOIN t_file ON t_file.politics_status_info_id = t_politics_status_info.politics_status_info_id
-  WHERE
-	t_user.user_id = ?
-*/
 exports.queryPersonInfo = async ctx => {
   let params = ctx.query
   console.log(params)
   let sql = `
     SELECT
+    t_user.student_id as new_student_id,
+    t_student_info.*,
     t_role.role_name,
     t_user.*,
     t_college.college_name,
@@ -326,10 +300,12 @@ exports.queryPersonInfo = async ctx => {
   LEFT JOIN t_file ON t_file.politics_status_info_id = t_politics_status_info.politics_status_info_id
   LEFT JOIN t_politics_status ON t_politics_status.politics_status_id=t_student_info.politics_status_id
   WHERE
-    t_user.user_id = ?
+    t_user.user_id = ${params.user_id}
   `
-  let res = await db.query(sql, [params.user_id])
-
+  console.log('----sql-- = ', sql)
+  let res = await db.query(sql)
+  console.log(res)
+  console.log('-------')
   function fn(obj, key, value) {
     return !obj.find(item => item[key] === value)
   }
@@ -381,10 +357,12 @@ exports.queryPersonInfo = async ctx => {
     }
   })
   let obj = res[0] || {}
+  obj.student_id = obj.new_student_id
   let baseInfo = {
     base: obj,
     fileList
   }
+  console.log(baseInfo)
   ctx.success({
     eduList,
     familyList,
@@ -500,3 +478,68 @@ exports.uploadFile = async ctx => {
   }
 }
 // 学生基本信息管理
+exports.queryStudentInfoList = async ctx =>{
+  let params = ctx.query;
+  const { currentPage, pageSize,class_id, specialty } = params;
+  let sql = `
+    SELECT
+      t_user.user_id,
+      t_user.role_id,
+      t_user.teacher_id,
+      t_student_info.politics_status_id,
+      t_student_info.politics_status_info_id,
+      t_specialty.college_id,
+      t_user.user_name,
+      t_user.user_sex,
+      t_college.college_name,
+      t_specialty.specialty_name,
+      t_class.class_name,
+      t_student_info.student_id
+    FROM
+      t_student_info
+    LEFT JOIN t_user ON t_student_info.user_id = t_user.user_id
+    LEFT JOIN t_class ON t_student_info.class_id = t_class.class_id
+    LEFT JOIN t_specialty ON t_specialty.specialty = t_class.specialty
+    LEFT JOIN t_college ON t_college.college_id = t_user.college_id
+    WHERE
+      t_student_info.is_delete = 0
+    AND t_specialty.college_id = ${ctx.session.userInfo.college_id}
+  `
+  let countSql =
+    `
+    SELECT
+      count(*) as count
+    FROM
+      t_student_info
+    LEFT JOIN t_user ON t_student_info.user_id = t_user.user_id
+    LEFT JOIN t_class ON t_student_info.class_id = t_class.class_id
+    LEFT JOIN t_specialty ON t_specialty.specialty = t_class.specialty
+    LEFT JOIN t_college ON t_college.college_id = t_user.college_id
+    WHERE
+      t_student_info.is_delete = 0
+    AND t_specialty.college_id = ${ctx.session.userInfo.college_id}
+    `;
+
+  if (class_id && class_id != 'all') {
+    sql += ' and t_class.class_id = "' + class_id + '"';
+    countSql += ' and t_class.class_id = "' + class_id + '"';
+  }
+  if (specialty && specialty != 'all') {
+    sql += ' and t_specialty.specialty = "' + specialty + '"';
+    countSql += ' and t_specialty.specialty = "' + specialty + '"';
+  }
+  sql += ' limit ' + (currentPage - 1) * pageSize + ',' + pageSize;
+  
+  console.log(sql)
+  
+  const result = await db.query(sql);
+  const countResult = await db.query(countSql);
+  ctx.success({
+    studentList: result,
+    page: {
+      currentPage: parseInt(currentPage),
+      pageSize: parseInt(pageSize),
+      total: countResult[0].count
+    }
+  });
+}
