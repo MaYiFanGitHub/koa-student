@@ -302,10 +302,7 @@ exports.queryPersonInfo = async ctx => {
   WHERE
     t_user.user_id = ${params.user_id}
   `
-  console.log('----sql-- = ', sql)
   let res = await db.query(sql)
-  console.log(res)
-  console.log('-------')
   function fn(obj, key, value) {
     return !obj.find(item => item[key] === value)
   }
@@ -362,7 +359,6 @@ exports.queryPersonInfo = async ctx => {
     base: obj,
     fileList
   }
-  console.log(baseInfo)
   ctx.success({
     eduList,
     familyList,
@@ -459,7 +455,7 @@ exports.uploadFile = async ctx => {
   // 创建可读流
   const reader = fs.createReadStream(file.path);
   // 写入文件名称
-  let writeFileName = `政治_${Date.now() + file.name.substring(file.name.lastIndexOf('.'))}`
+  let writeFileName = `文件_${Date.now() + file.name.substring(file.name.lastIndexOf('.'))}`
   // 写入路径
   let filePath = path.join(__dirname, '../', 'public/upload/') + `${writeFileName}`;
   // 访问路径
@@ -542,4 +538,91 @@ exports.queryStudentInfoList = async ctx =>{
       total: countResult[0].count
     }
   });
+}
+// 奖惩添加
+exports.addHonor = async ctx => {
+  let  params = ctx.request.body;
+  let fileList = params.fileList
+  
+  delete params.fileList
+  delete params.college_id
+
+  let sql = 'insert into t_honor set ?'
+  let res = await db.insert(sql, params)
+
+  // 插入文件表
+  fileList.forEach(async item => {
+    let sql = 'insert into t_file set ?'
+    await db.update(sql, {
+      honor_id: res.insertId,
+      file_url: item.url
+    })
+  })
+
+  ctx.success({})
+}
+// 奖惩列表查询
+exports.queryHonor = async ctx => {
+  let params = ctx.query
+  let sql = `
+  SELECT
+    t_user.user_id,
+    t_user.user_name,
+    t_honor.*
+  FROM
+    t_honor
+  LEFT JOIN t_user ON t_user.student_id = t_honor.student_id
+  WHERE t_honor.student_id = ${params.student_id}
+  `
+  if (params.honor_type && params.honor_type != 'all') {
+    sql += ' and t_honor.honor_type = ' + params.honor_type;
+  }
+  let honorRes = await db.query(sql)
+  for (let i = 0; i < honorRes.length; i++) {
+    let fileSql = `select * from t_file where honor_id = ?`
+    fileRes = await db.query(fileSql, [honorRes[i].honor_id])
+    honorRes[i].fileList = fileRes
+  }
+  ctx.success(honorRes)
+}
+// 奖惩更新
+exports.updateHonor = async ctx => {
+  let  params = ctx.request.body;
+  let fileList = params.fileList
+  
+  delete params.fileList
+  delete params.college_id
+
+  // 删除文件表
+  let removeSql = 'delete from t_file where honor_id = ' + params.honor_id
+  db.update(removeSql, [params.honor_id])
+  console.log(removeSql)
+
+  // 插入文件表
+  fileList.forEach(async item => {
+    let sql = 'insert into t_file set ?'
+    await db.update(sql, {
+      honor_id: params.honor_id,
+      file_url: item.url
+    })
+  })
+
+  let sql = `
+  UPDATE t_honor
+  SET honor_type = ${params.honor_type}, honor_time = '${params.honor_time}', honor_name = '${params.honor_name}', honor_rank = '${params.honor_rank}'
+  WHERE
+    honor_id = ${params.honor_id}
+  `
+  await db.update(sql)
+  ctx.success({})
+}
+// 奖惩删除
+exports.removeHonor = async ctx => {
+  let params = ctx.query
+  let removeFile = 'delete from t_file where honor_id = ?'
+  await db.update(removeFile, [params.honor_id])
+
+  let removeHonor = 'delete from t_honor where honor_id = ?'
+  await db.update(removeHonor, [params.honor_id])
+  ctx.success()
 }

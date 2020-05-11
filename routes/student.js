@@ -34,10 +34,12 @@ router.post('/addEdu', StudentService.addEduList)
 router.post('/addFamily', StudentService.addFamilyList)
 // 添加政治面貌信息
 router.post('/addPolitics', StudentService.addPolitics)
-// 删除班级
-// router.get('/remove', StudentService.removeStudent)
-// 更新班级
-// router.post('/edit', StudentService.updateStudent)
-// 查询所有班级
-// router.get('/queryList', StudentService.queryStudentList)
+// 添加奖惩信息
+router.post('/addHonor', StudentService.addHonor)
+// 查询个人奖惩信息
+router.get('/queryHonor', StudentService.queryHonor)
+// 更新奖惩信息
+router.post('/updateHonor', StudentService.updateHonor)
+// 删除奖惩信息
+router.get('/removeHonor', StudentService.removeHonor)
 module.exports = router 
