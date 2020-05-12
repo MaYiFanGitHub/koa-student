@@ -42,4 +42,13 @@ router.get('/queryHonor', StudentService.queryHonor)
 router.post('/updateHonor', StudentService.updateHonor)
 // 删除奖惩信息
 router.get('/removeHonor', StudentService.removeHonor)
+// 删除就业信息
+router.get('/removeJob', StudentService.removeJob)
+// 添加就业信息
+router.post('/addJob', StudentService.addJob)
+// 更新就业信息
+router.post('/updateJob', StudentService.updateJob)
+// 多条件分页查询就业情况列表
+router.get('/queryJob', StudentService.queryJob)
+
 module.exports = router 

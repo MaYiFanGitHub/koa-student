@@ -626,3 +626,153 @@ exports.removeHonor = async ctx => {
   await db.update(removeHonor, [params.honor_id])
   ctx.success()
 }
+// 就业信息添加
+exports.addJob = async ctx => {
+  let  params = ctx.request.body;
+  let fileList = params.fileList
+  
+  delete params.fileList
+  delete params.college_id
+
+  let sql = 'insert into t_job set ?'
+  let res = await db.insert(sql, params)
+
+  // 更新文件表
+  fileList.forEach(async item => {
+    let sql = 'update t_file set job_id = ? where file_id = ?'
+    await db.update(sql, [
+      res.insertId,
+      item.file_id
+    ])
+  })
+
+  ctx.success({})
+}
+// 就业信息删除
+exports.removeJob = async ctx => {
+  let params = ctx.query
+  let removeFile = 'delete from t_file where job_id = ?'
+  await db.update(removeFile, [params.honor_id])
+
+  let removeJob = 'delete from t_job where job_id = ?'
+  await db.update(removeJob, [params.job_id])
+  ctx.success()
+
+  ctx.success({})
+}
+// 就业信息更新
+exports.updateJob = async ctx => {
+  let  params = ctx.request.body;
+  let fileList = params.fileList
+  
+  delete params.fileList
+  delete params.college_id
+
+  // 删除文件表
+  let removeSql = 'delete from t_file where job_id = ' + params.job_id
+  db.update(removeSql, [params.job_id])
+
+  // 插入文件表
+  fileList.forEach(async item => {
+    let sql = 'insert into t_file set ?'
+    await db.update(sql, {
+      job_id: params.job_id,
+      file_url: item.url
+    })
+  })
+
+  let sql = `
+  UPDATE t_job
+  SET job_name = ?, job_code = ?, job_address = ?, job_person = ?, job_tel = ?, job_content = ?
+  WHERE
+    job_id = ?
+  `
+  await db.update(sql, [params.job_name, params.job_code, params.job_address, params.job_person, params.job_tel, params.job_content, params.job_id])
+  ctx.success({})
+}
+
+// 就业模块查询学生列表
+exports.queryJob = async ctx =>{
+  let params = ctx.query;
+  const { currentPage, pageSize,class_id, specialty, user_name } = params;
+  let sql = `
+  SELECT
+    t_user.user_id,
+    t_user.role_id,
+    t_user.teacher_id,
+    t_student_info.politics_status_id,
+    t_student_info.politics_status_info_id,
+    t_specialty.college_id,
+    t_user.user_name,
+    t_user.user_sex,
+    t_college.college_name,
+    t_specialty.specialty_name,
+    t_class.class_name,
+    t_student_info.student_id,
+    t_job.job_id,
+    t_job.job_name,
+    t_job.job_code,
+    t_job.job_address,
+    t_job.job_person,
+    t_job.job_tel,
+    t_job.job_content
+  FROM
+    t_student_info
+  LEFT JOIN t_user ON t_student_info.user_id = t_user.user_id
+  LEFT JOIN t_class ON t_student_info.class_id = t_class.class_id
+  LEFT JOIN t_specialty ON t_specialty.specialty = t_class.specialty
+  LEFT JOIN t_college ON t_college.college_id = t_user.college_id
+  LEFT JOIN t_job ON t_student_info.student_id = t_job.student_id
+  WHERE
+    t_student_info.is_delete = 0
+  AND t_specialty.college_id = ${ctx.session.userInfo.college_id}
+  `
+  let countSql =
+    `
+    SELECT
+      count(*) as count
+    FROM
+      t_student_info
+    LEFT JOIN t_user ON t_student_info.user_id = t_user.user_id
+    LEFT JOIN t_class ON t_student_info.class_id = t_class.class_id
+    LEFT JOIN t_specialty ON t_specialty.specialty = t_class.specialty
+    LEFT JOIN t_college ON t_college.college_id = t_user.college_id
+    LEFT JOIN t_job ON t_student_info.student_id = t_job.student_id
+    WHERE
+      t_student_info.is_delete = 0
+    AND t_specialty.college_id = ${ctx.session.userInfo.college_id}
+    `;
+
+  if (class_id && class_id != 'all') {
+    sql += ' and t_class.class_id = "' + class_id + '"';
+    countSql += ' and t_class.class_id = "' + class_id + '"';
+  }
+  if (specialty && specialty != 'all') {
+    sql += ' and t_specialty.specialty = "' + specialty + '"';
+    countSql += ' and t_specialty.specialty = "' + specialty + '"';
+  }
+  if (user_name) {
+    sql += ' and t_user.user_name like "%' + user_name  + '%"';
+    countSql += ' and t_user.user_name like "%' + user_name  + '%"';
+  }
+  sql += ' limit ' + (currentPage - 1) * pageSize + ',' + pageSize;
+  
+  console.log(sql)
+  
+  const result = await db.query(sql);
+  const countResult = await db.query(countSql);
+
+  for (let i = 0; i < result.length; i++) {
+    let fileSql = `select * from t_file where job_id = ?`
+    fileRes = await db.query(fileSql, [result[i].job_id])
+    result[i].fileList = fileRes
+  }
+  ctx.success({
+    jobList: result,
+    page: {
+      currentPage: parseInt(currentPage),
+      pageSize: parseInt(pageSize),
+      total: countResult[0].count
+    }
+  });
+}
