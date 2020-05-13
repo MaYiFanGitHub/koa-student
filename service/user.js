@@ -5,9 +5,14 @@ exports.selectAllUser = async ctx => {
   let params = ctx.query;
   const { currentPage, pageSize, user_username, user_name, role_id } = params;
   let sql =
-    'SELECT t_user.*, t_role.role_name, t_teacher_info.teacher_title,t_student_info.politics_status_id,t_politics_status.politics_status,t_student_info.class_id, t_class.class_name, t_specialty.specialty, t_specialty.specialty_name, t_college.college_id as student_college_id, t_college.college_name from t_user LEFT JOIN t_role ON t_user.role_id=t_role.role_id LEFT JOIN t_student_info ON t_user.user_id=t_student_info.user_id LEFT JOIN t_teacher_info ON t_user.user_id=t_teacher_info.user_id LEFT JOIN t_class ON t_student_info.class_id=t_class.class_id LEFT JOIN t_specialty ON t_class.specialty=t_specialty.specialty LEFT JOIN t_college ON t_college.college_id=t_specialty.college_id LEFT JOIN t_politics_status ON t_student_info.politics_status_id=t_politics_status.politics_status_id where t_user.is_delete=0 and t_user.college_id = ' + ctx.session.userInfo.college_id + ' ';
+    'SELECT t_user.*, t_role.role_name, t_teacher_info.teacher_title,t_student_info.politics_status_id,t_politics_status.politics_status,t_student_info.class_id, t_class.class_name, t_specialty.specialty, t_specialty.specialty_name, t_college.college_id as student_college_id, t_college.college_name from t_user LEFT JOIN t_role ON t_user.role_id=t_role.role_id LEFT JOIN t_student_info ON t_user.user_id=t_student_info.user_id LEFT JOIN t_teacher_info ON t_user.user_id=t_teacher_info.user_id LEFT JOIN t_class ON t_student_info.class_id=t_class.class_id LEFT JOIN t_specialty ON t_class.specialty=t_specialty.specialty LEFT JOIN t_college ON t_college.college_id=t_specialty.college_id LEFT JOIN t_politics_status ON t_student_info.politics_status_id=t_politics_status.politics_status_id where t_user.is_delete=0 ';
   let countSql =
-    'SELECT count(*) as count from t_user LEFT JOIN t_role ON t_user.role_id=t_role.role_id LEFT JOIN t_student_info ON t_user.user_id=t_student_info.user_id LEFT JOIN t_teacher_info ON t_user.user_id=t_teacher_info.user_id LEFT JOIN t_class ON t_student_info.class_id=t_class.class_id LEFT JOIN t_specialty ON t_class.specialty=t_specialty.specialty LEFT JOIN t_college ON t_college.college_id=t_specialty.college_id LEFT JOIN t_politics_status ON t_student_info.politics_status_id=t_politics_status.politics_status_id where t_user.is_delete=0 and t_user.college_id = ' + ctx.session.userInfo.college_id + ' ';
+    'SELECT count(*) as count from t_user LEFT JOIN t_role ON t_user.role_id=t_role.role_id LEFT JOIN t_student_info ON t_user.user_id=t_student_info.user_id LEFT JOIN t_teacher_info ON t_user.user_id=t_teacher_info.user_id LEFT JOIN t_class ON t_student_info.class_id=t_class.class_id LEFT JOIN t_specialty ON t_class.specialty=t_specialty.specialty LEFT JOIN t_college ON t_college.college_id=t_specialty.college_id LEFT JOIN t_politics_status ON t_student_info.politics_status_id=t_politics_status.politics_status_id where t_user.is_delete=0 ';
+  
+  if (ctx.session.userInfo.college_id) {
+    sql +=  ' and t_user.college_id = ' + ctx.session.userInfo.college_id + ' '
+    countSql += ' and t_user.college_id = ' + ctx.session.userInfo.college_id + ' '
+  }
   if (user_username) {
     sql += ' and t_user.user_username like "%' + user_username + '%"';
     countSql += ' and t_user.user_username like "%' + user_username + '%"';
@@ -21,13 +26,10 @@ exports.selectAllUser = async ctx => {
     countSql += ' and t_user.role_id = ' + role_id;
   } else if (role_id == -1) {
     let flagId = ctx.session.userInfo.role_id
-    /* 
-      AND (t_user.college_id = 20 AND t_user.role_id = 2)
-      OR (t_user.college_id = 20 AND t_user.role_id = 3)
-    */
+    
     if (flagId === 0) {
-      sql += ' and (t_user.college_id = '+ctx.session.userInfo.college_id+' AND t_user.role_id = 0) or (t_user.college_id = '+ctx.session.userInfo.college_id+' AND t_user.role_id = 1)';
-      countSql += ' and (t_user.college_id = '+ctx.session.userInfo.college_id+' AND t_user.role_id = 0) or (t_user.college_id = '+ctx.session.userInfo.college_id+' AND t_user.role_id = 1)';
+      sql += ' and (t_user.role_id = 0 or t_user.role_id = 1)';
+      countSql += ' and (t_user.role_id = 0 or t_user.role_id = 1)';
     } else if (flagId === 1) {
       sql += ' and t_user.role_id = 4 ';
       countSql += ' and t_user.role_id = 4 ';
