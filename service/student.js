@@ -677,7 +677,7 @@ exports.updateJob = async ctx => {
     let sql = 'insert into t_file set ?'
     await db.update(sql, {
       job_id: params.job_id,
-      file_url: item.url
+      file_url: item.url || item.file_url
     })
   })
 
