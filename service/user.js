@@ -299,12 +299,14 @@ exports.login = async ctx => {
       t_student_info.student_id,
       t_student_info.politics_status_id,
       t_student_info.politics_status_info_id,
-      t_student_info.class_id
+      t_student_info.class_id,
+      t_class.specialty
     FROM
       t_user
     LEFT JOIN t_role ON t_user.role_id = t_role.role_id
     LEFT JOIN t_teacher_info ON t_user.user_id = t_teacher_info.user_id
     LEFT JOIN t_student_info ON t_user.user_id = t_student_info.user_id
+    LEFT JOIN t_class ON t_student_info.class_id = t_class.class_id
     WHERE
       t_user.is_delete = 0
       AND t_user.user_username = ?

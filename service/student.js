@@ -428,7 +428,7 @@ exports.addPolitics = async ctx => {
     let sql = 'insert into t_file set ?'
     await db.update(sql, {
       politics_status_info_id: res.insertId,
-      file_url: item.url
+      file_url: item.url  || item.file_url
     })
   })
   
@@ -603,7 +603,7 @@ exports.updateHonor = async ctx => {
     let sql = 'insert into t_file set ?'
     await db.update(sql, {
       honor_id: params.honor_id,
-      file_url: item.url
+      file_url: item.url || item.file_url
     })
   })
 
