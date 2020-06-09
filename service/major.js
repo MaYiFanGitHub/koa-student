@@ -67,7 +67,8 @@ exports.queryMajorAndClassByCollege = async ctx => {
     t_specialty.specialty,
     t_class.class_id,
     t_specialty.specialty_name,
-    t_class.class_name
+    t_class.class_name,
+    t_class.teacher_id
   FROM
     t_specialty
   LEFT JOIN t_class ON t_specialty.specialty = t_class.specialty
@@ -86,7 +87,8 @@ exports.queryMajorAndClassByCollege = async ctx => {
       if (obj.classList) {
         obj.classList.push({
           'class_id':item.class_id,
-          'class_name':item.class_name
+          'class_name':item.class_name,
+          'teacher_id': item.teacher_id
         })
       }
     } else {
@@ -95,7 +97,8 @@ exports.queryMajorAndClassByCollege = async ctx => {
         specialty_name: item.specialty_name,
         classList: [{
           'class_id':item.class_id,
-          'class_name':item.class_name
+          'class_name':item.class_name,
+          'teacher_id': item.teacher_id
         }]
       })
     }

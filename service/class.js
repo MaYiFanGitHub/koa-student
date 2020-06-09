@@ -17,7 +17,7 @@ exports.addClass = async ctx => {
 // 多条件查询班级
 exports.findAllClass = async ctx => {
   let params = ctx.query;
-  const { currentPage, pageSize, college_id, class_name, specialty } = params;
+  const { currentPage, pageSize, college_id, class_name, specialty, user_name } = params;
   let sql =
     'SELECT t_class.*, t_specialty.specialty_name , t_college.college_name,t_user.user_name, t_college.college_id from t_class, t_specialty, t_college, t_teacher_info, t_user where t_class.specialty=t_specialty.specialty AND t_specialty.college_id= t_college.college_id AND t_class.teacher_id=t_teacher_info.teacher_id AND t_teacher_info.user_id= t_user.user_id AND t_class.is_delete=0';
   let countSql =
@@ -26,6 +26,10 @@ exports.findAllClass = async ctx => {
   if (class_name) {
     sql += ' and t_class.class_name like "%' + class_name + '%"';
     countSql += ' and t_class.class_name like "%' + class_name + '%"';
+  }
+  if (user_name) {
+    sql += ' and t_user.user_name like "%' + user_name + '%"';
+    countSql += ' and t_user.user_name like "%' + user_name + '%"';
   }
   if (college_id && college_id != 'all') {
     sql += ' and t_college.college_id = ' + college_id;

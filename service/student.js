@@ -75,6 +75,10 @@ exports.teacherQueryScoreList = async ctx =>{
     sql += ' and t_specialty.specialty = "' + specialty + '"';
     countSql += ' and t_specialty.specialty = "' + specialty + '"';
   }
+  if (ctx.session.userInfo.role_id == 2) {
+    sql += ' AND t_class.teacher_id IN (select t_class.teacher_id from t_class WHERE t_class.teacher_id = '+ctx.session.userInfo.teacher_id+')';
+    countSql += ' AND t_class.teacher_id IN (select t_class.teacher_id from t_class WHERE t_class.teacher_id = '+ctx.session.userInfo.teacher_id+')';
+  }
   sql += ' GROUP BY t_student_info.student_id limit ' + (currentPage - 1) * pageSize + ',' + pageSize;
   
   console.log(sql)
@@ -248,6 +252,10 @@ exports.applyScoreList = async ctx => {
     sql += ' and  not t_score.type_end_time is null';
     countSql += ' and  not t_score.type_end_time is null';
   }
+  if (ctx.session.userInfo.role_id == 2) {
+    sql += ' AND t_class.teacher_id IN (select t_class.teacher_id from t_class WHERE t_class.teacher_id = '+ctx.session.userInfo.teacher_id+')';
+    countSql += ' AND t_class.teacher_id IN (select t_class.teacher_id from t_class WHERE t_class.teacher_id = '+ctx.session.userInfo.teacher_id+')';
+  }
   sql += ' limit ' + (currentPage - 1) * pageSize + ',' + pageSize;
   
   console.log(sql)
@@ -419,6 +427,10 @@ exports.addPolitics = async ctx => {
   delete politicsObj.fileList
   delete politicsObj.politics_status_id
 
+  if (!politicsObj.begin_time) {
+    delete politicsObj.begin_time
+  }
+  console.log(politicsObj)
   // 插入政治面貌
   let politicsSql = 'insert into t_politics_status_info set ?'
   let res = await db.insert(politicsSql, politicsObj)
@@ -523,6 +535,10 @@ exports.queryStudentInfoList = async ctx =>{
   if (specialty && specialty != 'all') {
     sql += ' and t_specialty.specialty = "' + specialty + '"';
     countSql += ' and t_specialty.specialty = "' + specialty + '"';
+  }
+  if (ctx.session.userInfo.role_id == 2) {
+    sql += ' AND t_class.teacher_id IN (select t_class.teacher_id from t_class WHERE t_class.teacher_id = '+ctx.session.userInfo.teacher_id+')';
+    countSql += ' AND t_class.teacher_id IN (select t_class.teacher_id from t_class WHERE t_class.teacher_id = '+ctx.session.userInfo.teacher_id+')';
   }
   sql += ' limit ' + (currentPage - 1) * pageSize + ',' + pageSize;
   
@@ -754,6 +770,10 @@ exports.queryJob = async ctx =>{
   if (user_name) {
     sql += ' and t_user.user_name like "%' + user_name  + '%"';
     countSql += ' and t_user.user_name like "%' + user_name  + '%"';
+  }
+  if (ctx.session.userInfo.role_id == 2) {
+    sql += ' AND t_class.teacher_id IN (select t_class.teacher_id from t_class WHERE t_class.teacher_id = '+ctx.session.userInfo.teacher_id+')';
+    countSql += ' AND t_class.teacher_id IN (select t_class.teacher_id from t_class WHERE t_class.teacher_id = '+ctx.session.userInfo.teacher_id+')';
   }
   sql += ' limit ' + (currentPage - 1) * pageSize + ',' + pageSize;
   

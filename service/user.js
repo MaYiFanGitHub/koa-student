@@ -34,8 +34,8 @@ exports.selectAllUser = async ctx => {
       sql += ' and t_user.role_id = 4 ';
       countSql += ' and t_user.role_id = 4 ';
     } else if (flagId === 4) {
-      sql += ' and (t_user.college_id = '+ctx.session.userInfo.college_id+' AND t_user.role_id = 2) or (t_user.college_id = '+ctx.session.userInfo.college_id+' AND t_user.role_id = 3)';
-      countSql += ' and (t_user.college_id = '+ctx.session.userInfo.college_id+' AND t_user.role_id = 2) or (t_user.college_id = '+ctx.session.userInfo.college_id+' AND t_user.role_id = 3)';
+      sql += ' and ((t_user.college_id = '+ctx.session.userInfo.college_id+' AND t_user.role_id = 2) or (t_user.college_id = '+ctx.session.userInfo.college_id+' AND t_user.role_id = 3))';
+      countSql += ' and ((t_user.college_id = '+ctx.session.userInfo.college_id+' AND t_user.role_id = 2) or (t_user.college_id = '+ctx.session.userInfo.college_id+' AND t_user.role_id = 3))';
     }
   }
 

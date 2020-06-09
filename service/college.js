@@ -82,7 +82,8 @@ exports.selectByMajor = async ctx => {
       if (obj.majorList) {
         obj.majorList.push({
           'specialty':item.specialty,
-          'specialty_name':item.specialty_name
+          'specialty_name':item.specialty_name,
+          'teacher_id': item.teacher_id
         })
       }
     } else {
@@ -91,7 +92,8 @@ exports.selectByMajor = async ctx => {
         college_name: item.college_name,
         majorList: [{
           'specialty':item.specialty,
-          'specialty_name':item.specialty_name
+          'specialty_name':item.specialty_name,
+          'teacher_id': item.teacher_id
         }]
       })
     }
